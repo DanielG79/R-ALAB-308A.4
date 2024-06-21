@@ -21,7 +21,28 @@ const API_KEY = '';
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+async function initialLoad() {
+  try {
+    // Set default headers and base URL for Axios
+    axios.defaults.headers.common['x-api-key'] = API_KEY;
+    axios.defaults.baseURL = 'https://api.thecatapi.com/v1';
 
+    const response = await axios.get('/breeds');
+    response.data.forEach(breed => {
+      const option = document.createElement('option');
+      option.value = breed.id;
+      option.textContent = breed.name;
+      breedSelect.appendChild(option);
+    });
+
+    // Call the event handler for the initial carousel load
+    handleBreedSelect();
+  } catch (error) {
+    console.error('Error loading breeds:', error);
+  }
+}
+
+initialLoad();   
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
