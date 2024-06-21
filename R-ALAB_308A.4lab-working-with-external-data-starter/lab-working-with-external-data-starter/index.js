@@ -116,6 +116,28 @@ async function handleBreedSelect() {
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
 
+axios.interceptors.request.use(
+  config => {
+    console.log('Request started:', new Date().toISOString());
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+axios.interceptors.response.use(
+  response => {
+    const requestTime = new Date().getTime() - new Date(response.config.headers['Date']).getTime();
+    console.log(`Request completed in ${requestTime}ms`);
+    return response;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+
 /**
  * 6. Next, we'll create a progress bar to indicate the request is in progress.
  * - The progressBar element has already been created for you.
@@ -131,6 +153,35 @@ async function handleBreedSelect() {
  *   once or twice per request to this API. This is still a concept worth familiarizing yourself
  *   with for future projects.
  */
+
+function updateProgress(progressEvent) {
+  const progress = (progressEvent.loaded / progressEvent.total) * 100;
+  progressBar.style.width = `${progress}%`;
+}
+
+axios.interceptors.request.use(
+  config => {
+    console.log('Request started:', new Date().toISOString());
+    progressBar.style.width = '0%';
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+axios.interceptors.response.use(
+  response => {
+    const requestTime = new Date().getTime() - new Date(response.config.headers['Date']).getTime();
+    console.log(`Request completed in ${requestTime}ms`);
+    progressBar.style.width = '100%';
+    return response;
+  },
+  error => {
+    progressBar.style.width = '0%';
+    return Promise.reject(error);
+  }
+);
 
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
