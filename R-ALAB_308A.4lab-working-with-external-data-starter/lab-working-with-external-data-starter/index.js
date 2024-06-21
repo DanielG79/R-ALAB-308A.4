@@ -58,6 +58,45 @@ initialLoad();
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
 
+async function handleBreedSelect() {
+  try {
+    const breedId = breedSelect.value;
+    const response = await axios.get(`/images/search?breed_ids=${breedId}&limit=10`);
+
+    // Clear the existing carousel and infoDump
+    Carousel.clearCarousel();
+    infoDump.innerHTML = '';
+
+    // Retrieve breed information
+    const breedResponse = await axios.get(`/breeds/${breedId}`);
+    const breedInfo = breedResponse.data;
+
+    // Create the carousel items
+    response.data.forEach(image => {
+      const carouselItem = Carousel.createCarouselItem(image.url, image.id);
+      Carousel.appendToCarousel(carouselItem);
+    });
+
+    // Create the informational section
+    const infoSection = document.createElement('div');
+    infoSection.innerHTML = `
+      <h2>${breedInfo.name}</h2>
+      <p>${breedInfo.description}</p>
+      <p>Origin: ${breedInfo.origin}</p>
+      <p>Life Span: ${breedInfo.life_span} years</p>
+      <p>Adaptability: ${breedInfo.adaptability}</p>
+      <p>Affection Level: ${breedInfo.affection_level}</p>
+      <p>Energy Level: ${breedInfo.energy_level}</p>
+    `;
+    infoDump.appendChild(infoSection);
+
+    // Restart the carousel
+    Carousel.restartCarousel();
+  } catch (error) {
+    console.error('Error loading breed information:', error);
+  }
+}
+
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
